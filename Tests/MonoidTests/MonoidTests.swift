@@ -140,9 +140,9 @@ final class MonoidTests: XCTestCase {
 
   func testTuple() {
     // TODO: `Semigroup.` is needed here because of the convenience `combine` on Monoid. is it worth it?
-    XCTAssertEqual((3, "HelloWorld"), tuple2(Semigroup.sum, .joined).combine((1, "Hello"), (2, "World")))
+    XCTAssertEqual((3, "HelloWorld"), tuple(semigroups: .sum, .joined).combine((1, "Hello"), (2, "World")))
     
-    XCTAssertEqual((3, "HelloWorld"), tuple2(.sum, .joined).fold([(1, "Hello"), (2, "World")]))
+    XCTAssertEqual((3, "HelloWorld"), tuple(monoids: .sum, .joined).fold([(1, "Hello"), (2, "World")]))
   }
 
   func testAverage() {

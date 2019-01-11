@@ -24,6 +24,14 @@ extension Semigroup {
       witness.mcombine(&lhs!, rhs1)
     })
   }
+
+  public static func optional<S: SemigroupProtocol>(_ witness: S) -> Monoid<A?> where S.A == A {
+    return Monoid<A?>(empty: nil, semigroup: Semigroup<A?>.init { lhs, rhs -> Void in
+      // TODO: better way?
+      guard lhs != nil, let rhs1 = rhs else { lhs = lhs ?? rhs; return }
+      witness.combine(&lhs!, rhs1)
+    })
+  }
 }
 
 extension Monoid {

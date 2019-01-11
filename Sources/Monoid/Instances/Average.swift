@@ -21,6 +21,6 @@ extension Average {
 
 extension Semigroup where A: BinaryFloatingPoint {
   public static var average: Semigroup<Average<A>> {
-    return tuple2(.sum, .sum).imap(Average.init, { ($0.count, $0.sum )})
+    return tuple(semigroups: .sum, .sum).imap(Average.init, { ($0.count, $0.sum )})
   }
 }

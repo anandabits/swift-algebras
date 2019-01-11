@@ -1,14 +1,15 @@
+public protocol SemigroupProtocol {
+    associatedtype A
+    func combine(_: inout A, _: A) -> Void
+}
+
 // TODO: should the generic be S?
-public struct Semigroup<A> {
+public struct Semigroup<A>: SemigroupProtocol {
   // Law: `combine(combine(a, b), c) == combine(a, combine(b, c))` for all a, b, c: A.
   public let mcombine: (inout A, A) -> Void
 
-  public var combine: (A, A) -> A {
-    return { lhs, rhs in
-      var result = lhs
-      self.mcombine(&result, rhs)
-      return result
-    }
+  public func combine(_ lhs: inout A, _ rhs: A) -> Void {
+    mcombine(&lhs, rhs)
   }
 
   public init(combine: @escaping (A, A) -> A) {
@@ -22,13 +23,38 @@ public struct Semigroup<A> {
     self.mcombine = mcombine
   }
 
+  public init<S: SemigroupProtocol>(_ semigroup: S) where S.A == A {
+    if let semigroup = semigroup as? Semigroup<A> {
+        self = semigroup
+    } else {
+        self.mcombine = semigroup.combine
+    }
+  }
+}
+
+extension SemigroupProtocol {
+  // defined here so it is available on all refining abstractions
+  // if we define it instead on all direct refinements of SemigroupProtocol
+  // we can run into ambiguity issues when those are merged in a
+  // a protocol such as CommutativeMonoidProtocol where two definitions of
+  // semigroup are available
+  public var semigroup: Semigroup<A> {
+    return Semigroup(mcombine: self.combine)
+  }
+
   func imap<B>(_ f: @escaping (A) -> B, _ g: @escaping (B) -> A) -> Semigroup<B> {
     return Semigroup<B>(combine: { lhs, rhs in
       f(self.combine(g(lhs), g(rhs)))
     })
   }
-  
-  public var dual: Semigroup {
+
+  public var dual: Semigroup<A> {
     return Semigroup { self.combine($1, $0) }
+  }
+
+  public func combine(_ lhs: A, _ rhs: A) -> A {
+    var result = lhs
+    combine(&result, rhs)
+    return result
   }
 }

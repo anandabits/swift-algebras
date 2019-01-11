@@ -1,8 +1,15 @@
 // TODO: CommutativeSemigroup
 
-public struct CommutativeSemigroup<A> {
+public protocol CommutativeSemigroupProtocol: SemigroupProtocol {
+    associatedtype A
+}
+public struct CommutativeSemigroup<A>: CommutativeSemigroupProtocol {
   public let combine: (A, A) -> A
   public let mcombine: (inout A, A) -> Void
+
+  public func combine(_ lhs: inout A, _ rhs: A) -> Void {
+    mcombine(&lhs, rhs)
+  }
 
   public init(combine: @escaping (A, A) -> A) {
     self.combine = combine
@@ -20,21 +27,30 @@ public struct CommutativeSemigroup<A> {
       return copy
     }
   }
+}
 
+extension CommutativeSemigroupProtocol {
   func imap<B>(_ f: @escaping (A) -> B, _ g: @escaping (B) -> A) -> CommutativeSemigroup<B> {
     return .init(combine: { lhs, rhs in
       f(self.combine(g(lhs), g(rhs)))
     })
   }
 
-  public var dual: CommutativeSemigroup {
+  public var dual: CommutativeSemigroup<A> {
     return .init { self.combine($1, $0) }
   }
 }
 
-public struct IdempotentSemigroup<A> {
+public protocol IdempotentSemigroupProtocol: SemigroupProtocol {
+    associatedtype A
+}
+public struct IdempotentSemigroup<A>: IdempotentSemigroupProtocol {
   public let combine: (A, A) -> A
   public let mcombine: (inout A, A) -> Void
+
+  public func combine(_ lhs: inout A, _ rhs: A) -> Void {
+    mcombine(&lhs, rhs)
+  }
 
   public init(combine: @escaping (A, A) -> A) {
     self.combine = combine
@@ -52,24 +68,33 @@ public struct IdempotentSemigroup<A> {
       return copy
     }
   }
+}
 
+extension IdempotentSemigroupProtocol {
   func imap<B>(_ f: @escaping (A) -> B, _ g: @escaping (B) -> A) -> IdempotentSemigroup<B> {
     return .init(combine: { lhs, rhs in
       f(self.combine(g(lhs), g(rhs)))
     })
   }
 
-  public var dual: IdempotentSemigroup {
+  public var dual: IdempotentSemigroup<A> {
     return .init { self.combine($1, $0) }
   }
 }
 
-public struct CommutativeMonoid<A> {
+public protocol CommutativeMonoidProtocol: CommutativeSemigroupProtocol, MonoidProtocol {
+    associatedtype A
+}
+public struct CommutativeMonoid<A>: CommutativeMonoidProtocol {
   // Law: `combine(a, b) == combine(b, a)` for all `a, b: A`.
   public let empty: A
   public let combine: (A, A) -> A
   public let mcombine: (inout A, A) -> Void
 
+  public func combine(_ lhs: inout A, _ rhs: A) -> Void {
+    mcombine(&lhs, rhs)
+  }
+
   public init(empty: A, combine: @escaping (A, A) -> A) {
     self.empty = empty
     self.combine = combine
@@ -91,30 +116,31 @@ public struct CommutativeMonoid<A> {
   public init(monoid: Monoid<A>) {
     self.init(empty: monoid.empty, semigroup: monoid.semigroup)
   }
+}
 
-  public var semigroup: Semigroup<A> {
-    return Semigroup(mcombine: self.mcombine)
-  }
-
-  public var monoid: Monoid<A> {
-    return Monoid(empty: self.empty, semigroup: self.semigroup)
-  }
-
+extension CommutativeMonoidProtocol {
   public func imap<B>(_ f: @escaping (A) -> B, _ g: @escaping (B) -> A) -> Monoid<B> {
     return Monoid<B>(empty: f(self.empty), semigroup: self.semigroup.imap(f, g))
   }
 
-  public var dual: CommutativeMonoid {
+  public var dual: CommutativeMonoid<A> {
     return CommutativeMonoid(monoid: self.monoid.dual)
   }
 }
 
-public struct IdemptentMonoid<A> {
+public protocol IdempotentMonoidProtocol: IdempotentSemigroupProtocol, MonoidProtocol {
+    associatedtype A
+}
+public struct IdemptentMonoid<A>: IdempotentMonoidProtocol {
   // Law: `combine(a, a) == a` for all `a: A`
   public let empty: A
   public let combine: (A, A) -> A
   public let mcombine: (inout A, A) -> Void
 
+  public func combine(_ lhs: inout A, _ rhs: A) -> Void {
+    mcombine(&lhs, rhs)
+  }
+
   public init(empty: A, combine: @escaping (A, A) -> A) {
     self.empty = empty
     self.combine = combine
@@ -136,20 +162,14 @@ public struct IdemptentMonoid<A> {
   public init(monoid: Monoid<A>) {
     self.init(empty: monoid.empty, semigroup: monoid.semigroup)
   }
+}
 
-  public var semigroup: Semigroup<A> {
-    return Semigroup(mcombine: self.mcombine)
-  }
-
-  public var monoid: Monoid<A> {
-    return Monoid(empty: self.empty, semigroup: self.semigroup)
-  }
-
+extension IdempotentMonoidProtocol {
   public func imap<B>(_ f: @escaping (A) -> B, _ g: @escaping (B) -> A) -> Monoid<B> {
     return Monoid<B>(empty: f(self.empty), semigroup: self.semigroup.imap(f, g))
   }
 
-  public var dual: IdemptentMonoid {
+  public var dual: IdemptentMonoid<A> {
     return IdemptentMonoid(monoid: self.monoid.dual)
   }
 }
