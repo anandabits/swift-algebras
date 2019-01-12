@@ -1,3 +1,9 @@
+// another example where we need generic extensions like this:
+// extension<T> Semigroup where T: Hashable, A == Set<A>
+// to use the Initializable pattern
+// but if we had them we could eliminate about half of this code
+// and a lot more in a deeper abstraction hierarchy
+
 extension Semigroup where A: Hashable {
   public static var union: Semigroup<Set<A>> {
     return .init(mcombine: { $0.formUnion($1) })
@@ -40,8 +46,8 @@ extension CommutativeMonoid where A: Hashable {
   }
 }
 
-extension IdemptentMonoid where A: Hashable {
-  public static var union: IdemptentMonoid<Set<A>> {
+extension IdempotentMonoid where A: Hashable {
+  public static var union: IdempotentMonoid<Set<A>> {
     return .init(empty: [], mcombine: { $0.formUnion($1) })
   }
 }

@@ -1,25 +1,19 @@
-extension Semigroup where A == () {
-  public static let void = Semigroup(mcombine: { _, _ in })
-}
-
-extension CommutativeSemigroup where A == () {
-  public static let void = CommutativeSemigroup(mcombine: { _, _ in })
-}
+// We can't use the Initializable pattern for both Commutative and Idempotent
+// unless we bring them back together in the abstraction graph
+// by introducing CommutativeIdempotentMonoid which would
+// give us a single leaf in the hierarchy on which to place the void operator.
+// Without that we need to carefully choose an overload set that does not produce ambiguity.
 
 extension IdempotentSemigroup where A == () {
   public static let void = IdempotentSemigroup(mcombine: { _, _ in })
 }
 
-extension Monoid where A == () {
-  public static let void = Monoid(empty: (), mcombine: { _, _ in })
+extension CommutativeMonoidInitializable where CM == CommutativeMonoid<()> {
+  public static var void: Self { return .init(CommutativeMonoid(empty: (), mcombine: { _, _ in })) }
 }
 
-extension CommutativeMonoid where A == () {
-  public static let void = CommutativeMonoid(empty: (), mcombine: { _, _ in })
-}
-
-extension IdemptentMonoid where A == () {
-  public static let void = IdemptentMonoid(empty: (), mcombine: { _, _ in })
+extension IdempotentMonoid where A == () {
+  public static let void = IdempotentMonoid(empty: (), mcombine: { _, _ in })
 }
 
 extension Semiring where A == () {

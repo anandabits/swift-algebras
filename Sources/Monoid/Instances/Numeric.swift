@@ -1,30 +1,13 @@
-extension Semigroup where A: Numeric {
-  public static var sum: Semigroup {
-    return Semigroup(combine: +)
-  }
-  
-  public static var product: Semigroup {
-    return Semigroup(combine: *)
-  }
-}
+// Numeric was a linear hierarchy with no need to build new types from A and no operators with constraints
+// so we can collapse it down to a single implementatoion of each operator.
 
-extension Monoid where A: Numeric {
-  public static var sum: Monoid {
-    return Monoid(empty: 0, semigroup: .sum)
+extension CommutativeMonoidInitializable where A: Numeric, CM == CommutativeMonoid<A> {
+  public static var sum: Self {
+    return .init(CommutativeMonoid(empty: 0, semigroup: Semigroup(combine: +)))
   }
 
-  public static var product: Monoid {
-    return Monoid(empty: 1, semigroup: .product)
-  }
-}
-
-extension CommutativeMonoid where A: Numeric {
-  public static var sum: CommutativeMonoid {
-    return CommutativeMonoid(empty: 0, semigroup: .sum)
-  }
-
-  public static var product: CommutativeMonoid {
-    return CommutativeMonoid(empty: 1, semigroup: .product)
+  public static var product: Self {
+    return .init(CommutativeMonoid(empty: 1, semigroup: Semigroup(combine: *)))
   }
 }
 

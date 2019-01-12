@@ -1,3 +1,5 @@
+// We would need associated constraints and generic extensions to apply the Initializable pattern here
+
 extension Semigroup {
   public static func pointwise<A0>(into witness: Semigroup<A>) -> Semigroup<(A0) -> A> {
     return .init { lhs, rhs in
@@ -41,14 +43,14 @@ extension CommutativeMonoid {
   }
 }
 
-extension IdemptentMonoid {
-  public static func pointwise<A0>(into witness: IdemptentMonoid<A>) -> IdemptentMonoid<(A0) -> A> {
+extension IdempotentMonoid {
+  public static func pointwise<A0>(into witness: IdempotentMonoid<A>) -> IdempotentMonoid<(A0) -> A> {
     return .init(
       empty: { _ in witness.empty },
       semigroup: Semigroup.pointwise(into: witness.semigroup)
     )
   }
-  public static func pointwise<A0, M: IdempotentMonoidProtocol>(into witness: M) -> IdemptentMonoid<(A0) -> A> where M.A == A {
+  public static func pointwise<A0, M: IdempotentMonoidProtocol>(into witness: M) -> IdempotentMonoid<(A0) -> A> where M.A == A {
     return .init(
       empty: { _ in witness.empty },
       semigroup: Semigroup.pointwise(into: witness.semigroup)

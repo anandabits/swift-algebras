@@ -2,6 +2,11 @@ public protocol SemigroupProtocol {
     associatedtype A
     func combine(_: inout A, _: A) -> Void
 }
+public protocol SemigroupInitializable {
+    associatedtype A // this lets us simulate generic extensions, see Comparable for an example
+    associatedtype S: SemigroupProtocol
+    init(_: S)
+}
 
 // TODO: should the generic be S?
 public struct Semigroup<A>: SemigroupProtocol {
@@ -31,6 +36,12 @@ public struct Semigroup<A>: SemigroupProtocol {
     }
   }
 }
+extension Semigroup: SemigroupInitializable { public typealias S = Semigroup<A> }
+extension Semigroup: CommutativeSemigroupInitializable { public typealias CS = CommutativeSemigroup<A> }
+extension Semigroup: IdempotentSemigroupInitializable { public typealias IS = IdempotentSemigroup<A> }
+extension Semigroup: MonoidInitializable { public typealias M = Monoid<A> }
+extension Semigroup: CommutativeMonoidInitializable { public typealias CM = CommutativeMonoid<A> }
+extension Semigroup: IdempotentMonoidInitializable { public typealias IM = IdempotentMonoid<A> }
 
 extension SemigroupProtocol {
   // defined here so it is available on all refining abstractions

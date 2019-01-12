@@ -1,12 +1,16 @@
-extension Semigroup {
-  public static var last: Semigroup<A> {
-    return .init { _, last in last }
+extension SemigroupInitializable where S == Semigroup<A> {
+  public static var last: Self {
+    return .init(Semigroup { _, last in last })
   }
 
   public static var first: Semigroup<A> {
-    return .init { first, _ in first }
+    return .init(Semigroup { first, _ in first })
   }
+}
 
+// can't put this on SemigroupInitializable because A must be the argument to Semigroup in that context
+// we would need true generic extensions to be able to do that
+extension Semigroup {
   public static var lastNonNil: Semigroup<A?> {
     return .init { $1 ?? $0 }
   }

@@ -2,6 +2,11 @@ public protocol MonoidProtocol: SemigroupProtocol {
     associatedtype A
     var empty: A { get }
 }
+public protocol MonoidInitializable {
+    associatedtype A // this lets us simulate generic extensions, see Comparable for an example
+    associatedtype M: MonoidProtocol
+    init(_: M)
+}
 
 // TODO: should the generic be M?
 public struct Monoid<A>: MonoidProtocol {
@@ -41,6 +46,9 @@ public struct Monoid<A>: MonoidProtocol {
     self.mcombine = semigroup.mcombine
   }
 }
+extension Monoid: MonoidInitializable { public typealias M = Monoid<A> }
+extension Monoid: CommutativeMonoidInitializable { public typealias CM = CommutativeMonoid<A> }
+extension Monoid: IdempotentMonoidInitializable { public typealias IM = IdempotentMonoid<A> }
 
 extension MonoidProtocol {
   public var monoid: Monoid<A> {
