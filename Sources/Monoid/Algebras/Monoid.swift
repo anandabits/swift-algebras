@@ -49,6 +49,7 @@ public struct Monoid<A>: MonoidProtocol {
 extension Monoid: MonoidInitializable { public typealias M = Monoid<A> }
 extension Monoid: CommutativeMonoidInitializable { public typealias CM = CommutativeMonoid<A> }
 extension Monoid: IdempotentMonoidInitializable { public typealias IM = IdempotentMonoid<A> }
+extension Monoid: CommutativeIdempotentMonoidInitializable { public typealias CIM = CommutativeIdempotentMonoid<A> }
 
 extension MonoidProtocol {
   public var monoid: Monoid<A> {

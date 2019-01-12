@@ -42,6 +42,8 @@ extension Semigroup: IdempotentSemigroupInitializable { public typealias IS = Id
 extension Semigroup: MonoidInitializable { public typealias M = Monoid<A> }
 extension Semigroup: CommutativeMonoidInitializable { public typealias CM = CommutativeMonoid<A> }
 extension Semigroup: IdempotentMonoidInitializable { public typealias IM = IdempotentMonoid<A> }
+extension Semigroup: CommutativeIdempotentSemigroupInitializable { public typealias CIS = CommutativeIdempotentSemigroup<A> }
+extension Semigroup: CommutativeIdempotentMonoidInitializable { public typealias CIM = CommutativeIdempotentMonoid<A> }
 
 extension SemigroupProtocol {
   // defined here so it is available on all refining abstractions
